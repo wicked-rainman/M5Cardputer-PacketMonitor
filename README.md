@@ -12,3 +12,12 @@ On startup, two Mutexs are created. One for shared memory and one to organise sc
 - task 5 Cycles the WiFi card through available WiFi channels
 - task 6 Stores any new Mac addresses found to be broadcasting Management packets. Again, a fixed size table holds these values. When it becomes full, the table is appended to a file on the SD card.
 - task 7 Enables user interaction with keyboard.
+
+## Keyboard interaction.
+
+Keyboard interaction can only take place after all tasks have initialised.
+
+- 'd' Kills all current tasks. Appends current cache contents to the network and device files, then outputs the files content to the serial port. Files are not removed. Process then loops forever awaiting a reset.
+- 'w' Kills all current tasks. Wipes the network and devices files, then waits forever, awaiting a reset.
+- 'L' As 'D', but trys to resolve each fixed source mac address to an OUI. This is a slow process, better suited to a PC, but the facility is there if needed. Records are output on serial. 
+
