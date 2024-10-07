@@ -46,7 +46,7 @@ void KeyboardBranch(void *abc) {
             }
             else if (Reason=='w') {
                 xSemaphoreTake(xShmem,portMAX_DELAY);
-                for(k=0;k<TaskCount-1;k++) vTaskDelete(tasks[k]); //K=1 because this is the first task
+                for(k=0;k<TaskCount;k++) vTaskDelete(tasks[k]); //K=1 because this is the first task
                 M5Cardputer.Display.fillScreen(TFT_BLACK);
                 M5Cardputer.Display.setTextColor(TFT_GREEN);
                 M5Cardputer.Display.setTextSize(3);
