@@ -1,4 +1,8 @@
 #include "NetworkScan.h"
+//----------------------------------------------------------------
+// Function NetworkScan
+// Purpose: Go figure
+//----------------------------------------------------------------
 void NetworkScan(void *Summat) {
   int16_t NetworkCount;
   int16_t ctr;

@@ -1,5 +1,4 @@
-#include <Arduino.h>
-#include <M5Cardputer.h>
+#include <string.h>
 #include "Defines.h"
 #include "esp_wifi.h"
 #include "esp_wifi_types.h"

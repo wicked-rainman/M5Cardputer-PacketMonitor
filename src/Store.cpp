@@ -1,5 +1,8 @@
 #include "Store.h"
 //---------------------------------------------------------
+// Functions StorePut and StoreFind
+// Purpose: Maintains a rolling cache of MAC addresses
+//---------------------------------------------------------
 bool StorePut(uint8_t *index, char *val, int32_t rssival) {
     static char msg[80];
     static char Mac[20];

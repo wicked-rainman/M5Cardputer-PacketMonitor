@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include "ScreenPrint.h"
 #include "Defines.h"
 #include "esp_wifi.h"

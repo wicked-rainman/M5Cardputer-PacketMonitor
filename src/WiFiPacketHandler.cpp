@@ -1,4 +1,9 @@
 #include "WiFiPacketHandler.h"
+//-----------------------------------------------------------
+// Function: WiFiPacketHandler
+// Purpose: Places previously unseen mac address pairs on 
+// an fifo queue for processing by DeviceAdd
+//-----------------------------------------------------------
 void WiFiPacketHandler(void* buff, wifi_promiscuous_pkt_type_t type) {
     static int k;
     static int LastUsed=0;

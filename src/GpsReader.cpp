@@ -1,4 +1,11 @@
 #include "GpsReader.h"
+//--------------------------------------------------------------
+// Function GpsReader
+// Purpose: Extracts time and location from $GNRMC messages
+// that have been read from the GPS attached to the serial port.
+// Sets the RTC so that if the GPS signal is lost, records still
+// have a time stamp.
+//--------------------------------------------------------------
 void GpsReader(void *whereami) {
     extern SemaphoreHandle_t xShmem;
     extern ESP32Time rtc;

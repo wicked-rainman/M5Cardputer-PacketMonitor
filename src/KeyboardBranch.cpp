@@ -1,4 +1,9 @@
 #include "KeyboardBranch.h"
+//-----------------------------------------------------------------
+// Function KeyboardBranch
+// Purpose: to allow dumping of found WiFi networks and macs to serial out.
+// Provisions for looking up MAC OUI values.
+//-----------------------------------------------------------------
 void KeyboardBranch(void *abc) {
     extern SemaphoreHandle_t xShmem;
     extern TaskHandle_t tasks[];
