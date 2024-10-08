@@ -20,3 +20,7 @@ Keyboard interaction can only take place after all tasks have initialised.
 - **'d'** Kills all current tasks. Appends current cache contents to the network and device files, then outputs the files content to the serial port. Files are not removed. Process then loops forever awaiting a reset.
 - **'w'** Kills all current tasks. Wipes the network and devices files, then waits forever, awaiting a reset.
 - **'L'** As 'D', but trys to resolve each fixed source mac address to an OUI. This is a slow process, better suited to a PC, but the facility is there if needed. Records are output on serial. 
+
+## To do
+
+1.  The OUI lookup process needs to be optimised.
