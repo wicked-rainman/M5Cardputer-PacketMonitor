@@ -3,33 +3,32 @@ void setup() {
   auto cfg = M5.config();
   M5Cardputer.begin(cfg,true);
   M5.Lcd.setTextSize(1);
-  USBSerial.begin(115200);
-  Serial1.begin(9600,SERIAL_8N1,1,2);
-  xScreen = xSemaphoreCreateMutex();
-  xShmem = xSemaphoreCreateMutex();
+  USBSerial.begin(115200);                          //Serial port for record output
+  Serial1.begin(9600,SERIAL_8N1,1,2);               //Serial port for GPS
+  xScreen = xSemaphoreCreateMutex();                //Used by the fuctios in ScreenPrint
+  xShmem = xSemaphoreCreateMutex();                 //Used by DeviceAdd,Gpsreader,NetworkScan,RolltoFix and keyboardBranch             
   xSemaphoreGive(xScreen);
   xSemaphoreGive(xShmem);
-  PacketQueue = xQueueCreate(20,12); 
+  PacketQueue = xQueueCreate(20,12);                //Used by WiFiPacketHandler and DeviceAdd
 
   //Initialise the display
-  ScreenPrint("SSID ",5,1,1,TFT_WHITE,TFT_BLACK);
-  ScreenPrint("ASSO ",5,3,1,TFT_WHITE,TFT_BLACK);
-  ScreenPrint("RECV ",5,5,1,TFT_WHITE,TFT_BLACK);
-  ScreenPrint("TYPE ",5,5,25,TFT_WHITE,TFT_BLACK);
-  ScreenPrint("SNDR ",5,7,1,TFT_WHITE,TFT_BLACK);
-  ScreenPrint("TYPE ",5,7,25,TFT_WHITE,TFT_BLACK);
-  ScreenPrint("TYPE ",5,7,25,TFT_WHITE,TFT_BLACK);
-  ScreenPrint("#",1,9,1,TFT_WHITE,TFT_BLACK);
-  ScreenPrint("RSSI ",5,9,7,TFT_WHITE,TFT_BLACK);
-  ScreenPrint("MODE ",5,9,16,TFT_WHITE,TFT_BLACK);
-  ScreenPrint("GPSF ",5,11,1,TFT_WHITE,TFT_BLACK);
-  ScreenPrint("TIME ",5,13,1,TFT_WHITE,TFT_BLACK);
-  DrawCircle(230,50,5,TFT_DARKGREY);
-  DrawCircle(230,65,5,TFT_DARKGREY);
-  DrawCircle(230,80,5,TFT_DARKGREY);
-  DrawCircle(230,95,5,TFT_DARKGREY);
-  DrawCircle(230,110,5,TFT_DARKGREY);
-  DrawCircle(230,125,5,TFT_DARKGREY);
+  ScreenPrint("SSID ",5,1,1,TFT_WHITE,TFT_BLACK);   //Network SSID
+  ScreenPrint("ASSO ",5,3,1,TFT_WHITE,TFT_BLACK);   //Rolling mac associated SSID
+  ScreenPrint("RECV ",5,5,1,TFT_WHITE,TFT_BLACK);   //Destination MAC   
+  ScreenPrint("TYPE ",5,5,25,TFT_WHITE,TFT_BLACK);  //Destination MAC rolling of fixed
+  ScreenPrint("SNDR ",5,7,1,TFT_WHITE,TFT_BLACK);   //Source MAC
+  ScreenPrint("TYPE ",5,7,25,TFT_WHITE,TFT_BLACK);  //Source MAC rolling or fixed
+  ScreenPrint("#",1,9,1,TFT_WHITE,TFT_BLACK);       //Rec count
+  ScreenPrint("RSSI ",5,9,7,TFT_WHITE,TFT_BLACK);   //Network RSSI
+  ScreenPrint("MODE ",5,9,16,TFT_WHITE,TFT_BLACK);  //A=Network added, E=Rolling network edited, D=client
+  ScreenPrint("GPSF ",5,11,1,TFT_WHITE,TFT_BLACK);  //Current LAT/LON
+  ScreenPrint("TIME ",5,13,1,TFT_WHITE,TFT_BLACK);  //Current time, TAI or RTC
+  DrawCircle(230,50,5,TFT_DARKGREY);                //Battery status
+  DrawCircle(230,65,5,TFT_DARKGREY);                //Device added
+  DrawCircle(230,80,5,TFT_DARKGREY);                //Network added
+  DrawCircle(230,95,5,TFT_DARKGREY);                //Rolling mac association
+  DrawCircle(230,110,5,TFT_DARKGREY);               //GPS fix
+  DrawCircle(230,125,5,TFT_DARKGREY);               //WiFi channel hop
 
 //Start storage card
  SPI.begin(SD_SPI_SCK_PIN, SD_SPI_MISO_PIN, SD_SPI_MOSI_PIN, SD_SPI_CS_PIN);
@@ -48,6 +47,7 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
 
+  //Create required tasks
   xTaskCreatePinnedToCore(GpsReader,"GR",5000,NULL,0,&tasks[TaskCount++],1);        //Start up the GPS reader
   while(!GpsLock) vTaskDelay(100);                                                  //Wait for a gps fix  
   xTaskCreatePinnedToCore(BatteryStatus,"BS",5000,NULL,0,&tasks[TaskCount++],1);    //Start up the battery monitor
