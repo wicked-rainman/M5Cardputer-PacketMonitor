@@ -27,9 +27,7 @@ void DumpNetworks() {
         file.close();
     }
     else {
-        #ifdef GENERATE_SERIAL_OUTPUT
-            USBSerial.println("Couldn't open network dump output file");
-        #endif
+        if(GENERATE_SERIAL_OUTPUT) USBSerial.println("Couldn't open network dump output file");
     }
 }
 //----------------------------------------------------------------------

@@ -64,6 +64,6 @@ void KeyboardBranch(void *abc) {
                 USBSerial.println("Other key pushed");
             }
         }
-        vTaskDelay(500);
+        vTaskDelay(KEYBOARD_BRANCH_INTERVAL);
     }
 }

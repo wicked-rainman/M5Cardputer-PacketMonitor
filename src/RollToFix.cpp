@@ -36,7 +36,7 @@ static int OldNetworkCount;
                   snprintf(Mac,20,"%02X%02X%02X%02X%02X%02X",
                     storeArray[ctr].MacAddress[0],storeArray[ctr].MacAddress[1],storeArray[ctr].MacAddress[2],
                     storeArray[ctr].MacAddress[3],storeArray[ctr].MacAddress[4],storeArray[ctr].MacAddress[5]);
-                  #ifdef GENERATE_SERIAL_OUTPUT
+                  if(GENERATE_SERIAL_OUTPUT) {
                     snprintf(msg,80,"%03d %c %s %c %d \"%s\" \"%s\" %s",
                       ctr,
                       storeArray[ctr].mode,
@@ -47,7 +47,7 @@ static int OldNetworkCount;
                       storeArray[ctr].Ssid_Assoc,
                       storeArray[ctr].fix);
                     USBSerial.printf("%s\n",msg);
-                  #endif
+                  }
                   ScreenPrint(storeArray[ctr].Ssid,32,1,6,TFT_GREEN,TFT_BLACK);
                   ScreenPrint(storeArray[ctr].Ssid_Assoc,32,3,6,TFT_YELLOW,TFT_BLACK);;
                   ScreenPrint(Mac,18,5,6,TFT_GREEN,TFT_BLACK);
@@ -71,6 +71,6 @@ static int OldNetworkCount;
       DrawCircle(230,95,5,TFT_DARKGREY);
       xSemaphoreGive(xShmem);
     }
-    vTaskDelay(ROLL_FIX_DELAY);
+    vTaskDelay(ROLL_FIX_INTERVAL);
   } 
 }

@@ -16,6 +16,6 @@ void ChannelHop(void *abc) {
    if(channel == CHANNEL_COUNT) channel = 0;
     OnOff ?   DrawCircle(230,125,5,TFT_PURPLE) : DrawCircle(230,125,5,TFT_CYAN);
     OnOff = !OnOff;
-    vTaskDelay(300);
+    vTaskDelay(WIFI_CHANNEL_SWITCH_INTERVAL);
   }
 }

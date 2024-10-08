@@ -15,6 +15,6 @@ void NetworkScan(void *Summat) {
       }
       xSemaphoreGive(xShmem);
     }
-    vTaskDelay(SCAN_INTERVAL);
+    vTaskDelay(NETWORK_SCAN_INTERVAL);
   }
 }

@@ -62,7 +62,7 @@ void GpsReader(void *whereami) {
                 RtcLock=false;
                 DrawCircle(230,110,5,TFT_ORANGE);
             }
-            vTaskDelay(500);
+            vTaskDelay(GPS_READ_INTERVAL);
         }
     }
 }

@@ -15,21 +15,21 @@ void DeviceAdd(void *abc) {
     extern uint8_t NewMacs[12];                 //Two six byte macs
     extern char DeviceTable[][160];             //Fully defined in main.h
     extern int DeviceCount;                     //Count of mac pairs currently in cache
-    int RetVal;
     static uint8_t Mac1[6];
     static uint8_t Mac2[6];
     static char Mac1Str[19];
     static char Mac2Str[19];
-    static char ssid[35];
+    static char ssid[MAX_SSID_LENGTH];
     static char Mac1R,Mac2R;                    //Fixed or rotating mac flag
-    static char assocssid[35];                  //Rolling mac of open associated WiFi network
+    static char assocssid[MAX_SSID_LENGTH];     //Rolling mac of open associated WiFi network
     static char GpsStr[25];                     //GPS Lat/Lon time string
     static char GpsTime[9];                 
     extern char GpsFix[];                       //'A' or not 'A'
     extern bool GpsLock;                        //Good fix established=true
     extern ESP32Time rtc;                       //Inaccurate internal RTC
-
     static char msg[80];
+    int RetVal;
+
     while(true) {
         if( xQueueReceive(PacketQueue, &NewMacs, (TickType_t) 5)) {     //If there is a packet in the queue
             memcpy(Mac1,NewMacs,6);                                     //Copy in the two mac addresses
@@ -82,9 +82,7 @@ void DeviceAdd(void *abc) {
             snprintf(DeviceTable[DeviceCount],110,"%03d D %s %c %s %c \"%s\" \"%s\" %s %s\n",DeviceCount,
             Mac1Str,Mac1R,Mac2Str,Mac2R, ssid,assocssid,GpsTime,GpsStr);
             DrawRect(5,115,DeviceCount*2,4,TFT_RED);
-            #ifdef GENERATE_SERIAL_OUTPUT          
-                USBSerial.printf("%s",DeviceTable[DeviceCount]); //Serial output each new entry
-            #endif
+            if(GENERATE_SERIAL_OUTPUT) USBSerial.printf("%s",DeviceTable[DeviceCount]); //Serial output each new entry
             DeviceCount++;
             //Table is full, so dump it's contents to SD and blank out the Device bar graph.
             //Reset DeviceCount back to zero (which makes the cache round robbin)

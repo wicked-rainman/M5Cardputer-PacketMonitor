@@ -4,10 +4,10 @@
 //Args: None used
 //
 //RTOS task to draw a visual representation of the battery state.
-//Updates (if battery state has changed) every 60 seconds.
+//Updates (if battery state has changed) every BATTERY_STATUS_INTERVAL seconds.
 //----------------------------------------------------------------------
 void BatteryStatus(void *something) {
-    static int32_t BatteryPercentage=1; 
+    static int32_t BatteryPercentage=1;         //Don't understand why getBatteryLevel returns a 32 bit int
     static int32_t PreviousCharge=0;
 
     while(true) {
@@ -19,6 +19,6 @@ void BatteryStatus(void *something) {
             else   DrawCircle(230,50,5,TFT_RED);
         }
         PreviousCharge=BatteryPercentage;
-        vTaskDelay(60000);
+        vTaskDelay(BATTERY_STATUS_INTERVAL);
     }
 }
