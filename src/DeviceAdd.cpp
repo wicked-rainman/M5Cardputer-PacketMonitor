@@ -81,7 +81,7 @@ void DeviceAdd(void *abc) {
             ScreenPrint(GpsTime,9,13,6,TFT_GREEN,TFT_BLACK);
             snprintf(DeviceTable[DeviceCount],110,"%03d D %s %c %s %c \"%s\" \"%s\" %s %s\n",DeviceCount,
             Mac1Str,Mac1R,Mac2Str,Mac2R, ssid,assocssid,GpsTime,GpsStr);
-            DrawRect(5,115,DeviceCount*2,4,TFT_RED);
+            DrawRect(5,115,DeviceCount,4,TFT_RED);
             if(GENERATE_SERIAL_OUTPUT) USBSerial.printf("%s",DeviceTable[DeviceCount]); //Serial output each new entry
             DeviceCount++;
             //Table is full, so dump it's contents to SD and blank out the Device bar graph.
