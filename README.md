@@ -23,4 +23,4 @@ Keyboard interaction can only take place after all tasks have initialised.
 
 ## To do
 
-1.  The OUI lookup process needs to be optimised. The OUI list has around 30K entries in it. The first 3rd of entries all relate to mac addresses begining with 00h (around 12k). These have been separated out, so two OUI table file exist, eq00Oui.txt and gt00Oui.txt. Having two lookup tables does help speed the process, but it's still slow.
+1.  The OUI lookup process needs to be optimised. The single OUI list has around 30K entries in it. The first 3rd of entries all relate to mac addresses begining with 00h (around 12k). These have been separated out, so now two OUI table files exist, _eq00Oui.txt_ and _gt00Oui.txt_. This helps to speed the process up, but it still requires further optimisation.
