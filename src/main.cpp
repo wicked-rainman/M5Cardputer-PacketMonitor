@@ -9,7 +9,7 @@ void setup() {
   xShmem = xSemaphoreCreateMutex();                 //Used by DeviceAdd,Gpsreader,NetworkScan,RolltoFix and keyboardBranch             
   xSemaphoreGive(xScreen);
   xSemaphoreGive(xShmem);
-  PacketQueue = xQueueCreate(20,12);                //Used by WiFiPacketHandler and DeviceAdd
+  PacketQueue = xQueueCreate(PACKET_QUEUE_SIZE,12);                //Used by WiFiPacketHandler and DeviceAdd
 
   //Initialise the display
   ScreenPrint("SSID ",5,1,1,TFT_WHITE,TFT_BLACK);   //Network SSID

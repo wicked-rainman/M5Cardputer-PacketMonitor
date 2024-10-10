@@ -89,7 +89,7 @@ void DeviceAdd(void *abc) {
             if(DeviceCount == MAX_DEVICE_TABLE_SIZE) {
                 DumpDevices();      //Append the cache entries to /devices.txt 
                 DeviceCount=0;      //Reset DeviceCount index to cache
-                DrawRect(5,115,MAX_DEVICE_TABLE_SIZE*2,4,TFT_BLACK); //Black out the device bargraph
+                DrawRect(5,115,MAX_DEVICE_TABLE_SIZE,4,TFT_BLACK); //Black out the device bargraph
             }
             DrawCircle(230,65,5,TFT_DARKGREY);
         }

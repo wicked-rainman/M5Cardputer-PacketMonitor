@@ -112,17 +112,35 @@ char *LookupOui(char *TargetMac) {
     extern int CachePos;
     static char PreviousMac[7];
     static File file;
+    static File eq00;
+    static File gt00;
     char debug[6];
     int k;
-
-    if(!file) {
-        file=SD.open("/ShortSortedOui.csv");
-        if(!file) {
+    //---------------------------------------------------------------------
+    //The OUI table has around 32k entries in it.
+    //One third of these entries are for mac addresses tha start 00h.
+    //Open one file pointer to the file that contains 00h records and
+    //another file pointer for mac addresses greater than 00h.
+    //This helps speed up the lookups
+    //---------------------------------------------------------------------
+    if(!eq00) {
+        eq00=SD.open("/00Oui.txt");
+        if(!eq00) {
             strncpy(ReturnStr,"Error",5);
             ReturnStr[5]=0x0;
             return ReturnStr;
         }        
     }
+
+    if(!gt00) {
+        gt00=SD.open("/GT00Oui.txt");
+        if(!gt00) {
+            strncpy(ReturnStr,"Error",5);
+            ReturnStr[5]=0x0;
+            return ReturnStr;
+        }        
+    }
+
 
     // Is the left half of the mac being looked up the same as previous lookup ?
     if (!memcmp(TargetMac,PreviousMac,6)) return ReturnStr;
@@ -140,6 +158,9 @@ char *LookupOui(char *TargetMac) {
     }
 
     //Not in cache, so look in oui file (Doh!)
+    //Choose which lookup file to use
+    if(!memcmp(TargetMac,"00",2)) file = eq00;
+    else file=gt00;
     file.seek(0);
     while(file.available()) {
         k=file.readBytesUntil('\n',Line,200);
