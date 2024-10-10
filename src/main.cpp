@@ -1,4 +1,14 @@
 #include "main.h"
+//-------------------------------------------------------------------
+// Main:
+// Purpose: Scan the 2.4 band for WiFi networks and store all found
+// Mac addresses and SSIDs.
+// Force the WiFi card to channel hop, collecting management packets.
+// Associate client mac addresses with WiFi mac addresses/SSIDs
+// 8th Oct 2024 - Version 0.9
+//-------------------------------------------------------------------
+
+
 void setup() {
   auto cfg = M5.config();
   M5Cardputer.begin(cfg,true);
@@ -12,6 +22,7 @@ void setup() {
   PacketQueue = xQueueCreate(PACKET_QUEUE_SIZE,12);                //Used by WiFiPacketHandler and DeviceAdd
 
   //Initialise the display
+
   ScreenPrint("SSID ",5,1,1,TFT_WHITE,TFT_BLACK);   //Network SSID
   ScreenPrint("ASSO ",5,3,1,TFT_WHITE,TFT_BLACK);   //Rolling mac associated SSID
   ScreenPrint("RECV ",5,5,1,TFT_WHITE,TFT_BLACK);   //Destination MAC   
@@ -31,10 +42,12 @@ void setup() {
   DrawCircle(230,125,5,TFT_DARKGREY);               //WiFi channel hop
 
 //Start storage card
+
  SPI.begin(SD_SPI_SCK_PIN, SD_SPI_MISO_PIN, SD_SPI_MOSI_PIN, SD_SPI_CS_PIN);
  if (!SD.begin(SD_SPI_CS_PIN, SPI, 25000000)) USBSerial.println("SD: Mount FAILED");
 
 //Set up WiFi
+
   nvs_flash_init();
   tcpip_adapter_init();
   wifi_init_config_t cfg1 = WIFI_INIT_CONFIG_DEFAULT();
@@ -48,6 +61,7 @@ void setup() {
   WiFi.disconnect();
 
   //Create required tasks
+
   xTaskCreatePinnedToCore(GpsReader,"GR",5000,NULL,0,&tasks[TaskCount++],1);        //Start up the GPS reader
   while(!GpsLock) vTaskDelay(100);                                                  //Wait for a gps fix  
   xTaskCreatePinnedToCore(BatteryStatus,"BS",5000,NULL,0,&tasks[TaskCount++],1);    //Start up the battery monitor
