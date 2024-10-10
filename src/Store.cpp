@@ -14,7 +14,7 @@ bool StorePut(uint8_t *index, char *val, int32_t rssival) {
     static char GpsTime[9];
     extern ESP32Time rtc;
 
-    if(StoreFind(index)<0) {
+    if(StoreFind(index)<0) {                                           
         DrawCircle(230,80,5,TFT_GREEN);
         if(StoreLastUsed==MAX_SSID_STORE_SIZE) {
             DumpNetworks();
@@ -37,6 +37,7 @@ bool StorePut(uint8_t *index, char *val, int32_t rssival) {
         storeArray[StoreLastUsed].Rssi = rssival;
         RollingMac(index[0]) ? (storeArray[StoreLastUsed].rolling = 'R'):(storeArray[StoreLastUsed].rolling='F');
         storeArray[StoreLastUsed].mode='A';
+        memset(storeArray[StoreLastUsed].Ssid_Assoc,0,MAX_SSID_LEN);   
         if(GpsLock) {
             memcpy(storeArray[StoreLastUsed].fix,GpsFix,40);
             memcpy(GpsStr,GpsFix+9,25);
@@ -64,7 +65,7 @@ bool StorePut(uint8_t *index, char *val, int32_t rssival) {
         }
         ScreenPrint(storeArray[StoreLastUsed].Ssid,32,1,6,TFT_GREEN,TFT_BLACK);
         memset(msg,' ',80);
-        ScreenPrint(msg,32,3,6,TFT_BLACK,TFT_BLACK);               //Blank Ssid assoc
+        ScreenPrint(msg,32,3,6,TFT_BLACK,TFT_BLACK);            //Blank Ssid assoc
         ScreenPrint(Mac,18,5,6,TFT_GREEN,TFT_BLACK);            //Print Receiver Mac
         ScreenPrint(msg,18,7,6,TFT_BLACK,TFT_BLACK);            //Blank out sender mac                    
         snprintf(msg,4,"%03d",StoreLastUsed); 

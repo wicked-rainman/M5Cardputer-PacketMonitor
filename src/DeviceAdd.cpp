@@ -37,8 +37,7 @@ void DeviceAdd(void *abc) {
             DrawCircle(230,65,5,TFT_ORANGE);
             RollingMac(Mac1[0]) ? Mac1R='R' : Mac1R='F';                //Set flags to indicat fixed or rolling mac
             RollingMac(Mac2[0]) ? Mac2R='R' : Mac2R='F';
-            memset(ssid,0,35);                                          //Set ssid and associated ssid to empty
-            memset(assocssid,0,35);
+
             if(xSemaphoreTake(xShmem,500)) {    //If the semaphore can be taken
                 RetVal = StoreFind(Mac2);       // Look up the receiver mac to see if there's an ssid.
                 if(RetVal>=0) {                 // If a match has been found
