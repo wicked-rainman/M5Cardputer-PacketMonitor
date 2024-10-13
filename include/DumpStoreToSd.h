@@ -6,4 +6,3 @@
 void DumpNetworks();
 void DumpDevices();
 void DumpFile(char *, bool);
-char *LookupOui(char *);
