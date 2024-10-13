@@ -4,6 +4,7 @@
 #include <SD.h>
 #include <ESP32Time.h>
 #include "Defines.h"
+#include "Prototypes.h"
 #include "StoreStruct.h"
 #include "esp_wifi.h"
 #include "esp_wifi_types.h"
@@ -16,16 +17,7 @@ SemaphoreHandle_t xScreen = NULL;
 SemaphoreHandle_t xShmem = NULL;
 QueueHandle_t PacketQueue;
 TaskHandle_t tasks[10];
-extern void ScreenPrint(char *, uint8_t,uint8_t, uint8_t,uint16_t,uint16_t);
-extern void DrawCircle(int32_t, int32_t, int32_t,int);
-extern void NetworkScan(void *);
-extern void RollToFix(void *);
-extern void WiFiPacketHandler(void*, wifi_promiscuous_pkt_type_t type);
-extern void ChannelHop(void *);
-extern void DeviceAdd(void *);
-extern void KeyboardBranch(void *);
-extern void BatteryStatus(void *);
-extern void GpsReader(void *);
+
 
 Store storeArray[MAX_SSID_STORE_SIZE+1];
 char DeviceTable[MAX_DEVICE_TABLE_SIZE][DEVICE_TABLE_RECSIZE];

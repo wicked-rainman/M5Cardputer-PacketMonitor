@@ -3,7 +3,4 @@
 #include <FS.h>
 #include "Defines.h"
 #include "StoreStruct.h"
-void DumpNetworks();
-void DumpDevices();
-void DumpFile(char *, bool);
-extern char *LookupOui(char *TargetMac);
+#include "Prototypes.h"
