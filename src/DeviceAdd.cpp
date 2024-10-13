@@ -12,18 +12,19 @@
 void DeviceAdd(void *abc) {
     extern SemaphoreHandle_t xShmem;            //Shared memory lock
     extern QueueHandle_t PacketQueue;           //Wifi packet handler incomming records
-    extern uint8_t NewMacs[12];                 //Two six byte macs
+    uint8_t NewMacs[12];                 //Two six byte macs
     extern char DeviceTable[][160];             //Fully defined in main.h
     extern int DeviceCount;                     //Count of mac pairs currently in cache
-    static uint8_t Mac1[6];
-    static uint8_t Mac2[6];
+    uint8_t Mac1[6];
+    uint8_t Mac2[6];
     static char Mac1Str[19];
     static char Mac2Str[19];
-    static char ssid[MAX_SSID_LENGTH];
-    static char Mac1R,Mac2R;                    //Fixed or rotating mac flag
-    static char assocssid[MAX_SSID_LENGTH];     //Rolling mac of open associated WiFi network
-    static char GpsStr[25];                     //GPS Lat/Lon time string
-    static char GpsTime[9];                 
+    static char AssocSsid[MAX_SSID_LENGTH];
+    static char ssid1[MAX_SSID_LENGTH];
+    char Mac2R;
+    char Mac1R;
+    char GpsStr[25];                     //GPS Lat/Lon time string
+    char GpsTime[9];                 
     extern char GpsFix[];                       //'A' or not 'A'
     extern bool GpsLock;                        //Good fix established=true
     extern ESP32Time rtc;                       //Inaccurate internal RTC
@@ -32,21 +33,24 @@ void DeviceAdd(void *abc) {
 
     while(true) {
         if( xQueueReceive(PacketQueue, &NewMacs, (TickType_t) 5)) {     //If there is a packet in the queue
+            DrawCircle(230,65,5,TFT_ORANGE);
             memcpy(Mac1,NewMacs,6);                                     //Copy in the two mac addresses
             memcpy(Mac2,NewMacs+6,6);
-            DrawCircle(230,65,5,TFT_ORANGE);
-            RollingMac(Mac1[0]) ? Mac1R='R' : Mac1R='F';                //Set flags to indicat fixed or rolling mac
+            RollingMac(Mac1[0]) ? Mac1R='R' : Mac1R='F';              
             RollingMac(Mac2[0]) ? Mac2R='R' : Mac2R='F';
+            snprintf(Mac1Str,18,"%02X%02X%02X%02X%02X%02X", Mac1[0],Mac1[1],Mac1[2],Mac1[3],Mac1[4],Mac1[5]);
+            snprintf(Mac2Str,18,"%02X%02X%02X%02X%02X%02X", Mac2[0],Mac2[1],Mac2[2],Mac2[3],Mac2[4],Mac2[5]);
+            memcpy(GpsStr,"xxxx.xxxxxN,xxxxx.xxxxxW\0",25); 
+            memcpy(GpsTime,rtc.getTime().c_str(),9);       
+            memset(AssocSsid,0,MAX_SSID_LENGTH);
+            strcpy(ssid1,"-");
+
 
             if(xSemaphoreTake(xShmem,500)) {    //If the semaphore can be taken
                 RetVal = StoreFind(Mac2);       // Look up the receiver mac to see if there's an ssid.
-                if(RetVal>=0) {                 // If a match has been found
-                    memcpy(ssid,storeArray[RetVal].Ssid,MAX_SSID_LENGTH);               //Copy in ssid
-                    memcpy(assocssid,storeArray[RetVal].Ssid_Assoc,MAX_SSID_LENGTH);    //Copy in assoc ssid
-                }
-                else {                          //There is no ssid or associated SSID with this mac.
-                    memset(ssid,0,35);
-                    memset(assocssid,0,35);
+                if(RetVal>=0) {
+                    memcpy(ssid1,storeArray[RetVal].Ssid,MAX_SSID_LENGTH); //Copy in ssid
+                    memcpy(AssocSsid,storeArray[RetVal].Ssid_Assoc,MAX_SSID_LENGTH); //Copy in Associated ssid
                 }
                 if(GpsLock) {                   //If there is a current GPS lock
                     memcpy(GpsStr,GpsFix+9,25); //Copy in the GPS Fix (lat/lon)
@@ -54,18 +58,11 @@ void DeviceAdd(void *abc) {
                     memcpy(GpsTime,GpsFix,8);   //Copy in the TAI.
                     GpsTime[8]=0x0;         
                 }
-                else {                                              //There is no current GPS lock
-                    memcpy(GpsStr,"xxxx.xxxxxN xxxxx.xxxxxW\0",25); //Apply empty default
-                    memcpy(GpsTime,rtc.getTime().c_str(),9);        //Take the time from the RTC
-                }
                 xSemaphoreGive(xShmem);         //Release the semaphore
             }
             //Print out values on the diddy little screen
-            snprintf(Mac1Str,18,"%02X%02X%02X%02X%02X%02X", NewMacs[0],NewMacs[1],NewMacs[2],NewMacs[3],NewMacs[4],NewMacs[5]);
-            snprintf(Mac2Str,18,"%02X%02X%02X%02X%02X%02X", NewMacs[6],NewMacs[7],NewMacs[8],NewMacs[9],NewMacs[10],NewMacs[11]);
-
-            ScreenPrint(ssid,32,1,6,TFT_GREEN,TFT_BLACK);
-            ScreenPrint(assocssid,32,3,6,TFT_GREEN,TFT_BLACK);
+            ScreenPrint(ssid1,MAX_SSID_LENGTH,1,6,TFT_GREEN,TFT_BLACK);
+            ScreenPrint(AssocSsid,MAX_SSID_LENGTH,3,6,TFT_GREEN,TFT_BLACK);
             ScreenPrint(Mac1Str,18,5,6,TFT_GREEN,TFT_BLACK);
             ScreenPrint(Mac2Str,18,7,6,TFT_GREEN,TFT_BLACK); 
             snprintf(msg,2,"%c",Mac1R);
@@ -77,9 +74,10 @@ void DeviceAdd(void *abc) {
             ScreenPrint("-00 ",3,9,12,TFT_GREEN,TFT_BLACK);
             ScreenPrint("D ",1,9,21,TFT_GREEN,TFT_BLACK);
             ScreenPrint(GpsStr,25,11,6,TFT_GREEN,TFT_BLACK);
-            ScreenPrint(GpsTime,9,13,6,TFT_GREEN,TFT_BLACK);
-            snprintf(DeviceTable[DeviceCount],110,"%03d D %s %c %s %c \"%s\" \"%s\" %s %s\n",DeviceCount,
-            Mac1Str,Mac1R,Mac2Str,Mac2R, ssid,assocssid,GpsTime,GpsStr);
+            if((Mac2R=='R') && (AssocSsid[0]!=0)) snprintf(DeviceTable[DeviceCount],160,"%03d,D,%s,%c,%s,%c,%s(%s),%s,%s\n",
+                    DeviceCount,Mac1Str,Mac1R,Mac2Str,Mac2R,ssid1,AssocSsid,GpsTime,GpsStr);
+            else snprintf(DeviceTable[DeviceCount],160,"%03d,D,%s,%c,%s,%c,%s,%s,%s\n",
+                DeviceCount,Mac1Str,Mac1R,Mac2Str,Mac2R,ssid1,GpsTime,GpsStr);
             DrawRect(5,115,DeviceCount,4,TFT_RED);
             if(GENERATE_SERIAL_OUTPUT) USBSerial.printf("%s",DeviceTable[DeviceCount]); //Serial output each new entry
             DeviceCount++;

@@ -30,7 +30,6 @@ TaskHandle_t tasks[10];
 
 Store storeArray[MAX_SSID_STORE_SIZE+1];
 char DeviceTable[MAX_DEVICE_TABLE_SIZE][DEVICE_TABLE_RECSIZE];
-uint8_t NewMacs[12];
 int StoreLastUsed=0;
 int DeviceCount=0;
 int TaskCount=0;

@@ -1,4 +1,5 @@
 #include "DumpStoreToSd.h"
+void CharReplace(char *, char, char);
 int CachePos=0;
 //----------------------------------------------------------------------
 // Function: DumpNetworks
@@ -17,7 +18,7 @@ void DumpNetworks() {
     File file = SD.open("/Networks.txt",FILE_APPEND);
     if(file) {
         for(k=0;k<StoreLastUsed;k++) {
-            snprintf(msg,160,"%03d %c %02X%02X%02X%02X%02X%02X %c %d \"%s\" \"%s\" %s\n",
+            snprintf(msg,160,"%03d,%c,%02X%02X%02X%02X%02X%02X,%c,%d,%s,%s,%s\n",
                 k,storeArray[k].mode,
                 storeArray[k].MacAddress[0],storeArray[k].MacAddress[1],storeArray[k].MacAddress[2],
                 storeArray[k].MacAddress[3],storeArray[k].MacAddress[4],storeArray[k].MacAddress[5],
@@ -67,26 +68,36 @@ void DumpDevices() {
 void DumpFile(char *fname, bool OuiLookup) {
     File file = SD.open(fname,FILE_READ);
     char InputLine[200];
-    char MacStr[7];
+    char MacStrSender[7];
+    char MacStrReceiver[7];
+    char OuiStr[150];
     int k=0;
     int ReccordCount=1;
     if(file) {
         while (file.available()) {
             k=file.readBytesUntil('\n',InputLine,200);
-            M5Cardputer.Display.setCursor(10,11);
-
             InputLine[k]=0x0;
-            if(((InputLine[4]=='D') || (InputLine[4]=='A')) && (InputLine[19]=='F')){
-                    memcpy(MacStr,InputLine+6,6);
-                    if(OuiLookup) {
-                        M5Cardputer.Display.setCursor(60,25);
-                        M5Cardputer.Display.fillRect(60,24,110,20,TFT_BLACK);
-                        M5Cardputer.Display.printf("%d",ReccordCount++);
-                        USBSerial.printf("%s (%s)\n",InputLine,LookupOui(MacStr));
+            if(OuiLookup) {
+                memset(OuiStr,0,150);
+                if(InputLine[19]=='F') {
+                    memcpy(MacStrSender,InputLine+6,6);
+                    snprintf(OuiStr,150,",%s",LookupOui(MacStrSender));
+                }
+                else snprintf(OuiStr,150,",");
+                if(InputLine[4]=='D') {
+                    if (InputLine[34]=='F') {
+                        memcpy(MacStrReceiver,InputLine+21,6);
+                        strcat(OuiStr,",");
+                        strcat(OuiStr,LookupOui(MacStrReceiver));
                     }
-                    else USBSerial.printf("%s\n",InputLine);
+                    else strcat(OuiStr,",");
+                }
+                USBSerial.printf("%s%s\n",InputLine,OuiStr);
             }
             else USBSerial.printf("%s\n",InputLine);
+            M5Cardputer.Display.setCursor(60,25);
+            M5Cardputer.Display.fillRect(60,24,110,20,TFT_BLACK);
+            M5Cardputer.Display.printf("%d",ReccordCount++);
         }
         file.close();
     }
@@ -151,8 +162,8 @@ char *LookupOui(char *TargetMac) {
         if(!memcmp(Cache[k],TargetMac,6)) {
             memcpy(ReturnStr,Cache[k]+7,MAX_OUI_VENDOR_LEN-7);
             ReturnStr[MAX_OUI_VENDOR_LEN-7]=0x0;
-            snprintf(debug,6," #%03d",k);
-            strcat(ReturnStr,debug);
+            //snprintf(debug,6," #%03d",k);
+            //strcat(ReturnStr,debug);
             return ReturnStr;
         }    
     }
@@ -167,6 +178,7 @@ char *LookupOui(char *TargetMac) {
         if(!memcmp(Line,TargetMac,6)) {
             if(k>MAX_OUI_VENDOR_LEN) {
                 Line[MAX_OUI_VENDOR_LEN]=0x0;
+                CharReplace(Line,',',' ');
                 k=MAX_OUI_VENDOR_LEN;
             }
             else Line[k]=0x0;

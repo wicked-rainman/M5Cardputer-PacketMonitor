@@ -16,7 +16,6 @@ void WiFiPacketHandler(void* buff, wifi_promiscuous_pkt_type_t type) {
     static char msg[80];
     static uint8_t bcast[6]={255,255,255,255,255,255};
     static uint8_t BeaconStore[BEACON_CACHE_SIZE][12];
-    extern uint8_t NewMacs[];
     extern QueueHandle_t PacketQueue;
 
     if (type != WIFI_PKT_MGMT) return;                          //Not interested if packet isn't management

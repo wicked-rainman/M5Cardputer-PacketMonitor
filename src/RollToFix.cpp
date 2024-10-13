@@ -25,9 +25,9 @@ static int OldNetworkCount;
         OldNetworkCount=StoreLastUsed;
         DrawCircle(230,95,5,TFT_RED);
         for(ctr=0;ctr<MAX_SSID_STORE_SIZE;ctr++){
-          if((storeArray[ctr].rolling == 'R') && (storeArray[ctr].mode !='E')) {
+          if((storeArray[ctr].rolling == 'R') && (storeArray[ctr].mode =='A')) {
             for(innerctr=0;innerctr<MAX_SSID_STORE_SIZE;innerctr++) {
-              if((storeArray[innerctr].rolling =='F') && (storeArray[innerctr].mode !='E')) {
+              if((storeArray[innerctr].rolling =='F') && (storeArray[innerctr].mode =='A')) {
                 if(!memcmp(storeArray[ctr].MacAddress+1, storeArray[innerctr].MacAddress+1,4)) {
                   LenSsid=strlen(storeArray[innerctr].Ssid);
                   strncpy(storeArray[ctr].Ssid_Assoc, storeArray[innerctr].Ssid,LenSsid);
@@ -37,7 +37,7 @@ static int OldNetworkCount;
                     storeArray[ctr].MacAddress[0],storeArray[ctr].MacAddress[1],storeArray[ctr].MacAddress[2],
                     storeArray[ctr].MacAddress[3],storeArray[ctr].MacAddress[4],storeArray[ctr].MacAddress[5]);
                   if(GENERATE_SERIAL_OUTPUT) {
-                    snprintf(msg,80,"%03d %c %s %c %d \"%s\" \"%s\" %s",
+                    snprintf(msg,80,"%03d,%c,%s,%c,%d,%s,%s,%s",
                       ctr,
                       storeArray[ctr].mode,
                       Mac,

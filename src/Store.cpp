@@ -3,7 +3,7 @@
 // Functions StorePut and StoreFind
 // Purpose: Maintains a rolling cache of MAC addresses
 //---------------------------------------------------------
-bool StorePut(uint8_t *index, char *val, int32_t rssival) {
+bool StorePut(uint8_t index[], char *val, int32_t rssival) {
     static char msg[80];
     static char Mac[20];
     static int ValLen;
@@ -46,7 +46,7 @@ bool StorePut(uint8_t *index, char *val, int32_t rssival) {
             GpsTime[8]=0x0;
         }
         else { //No gps lock, so use rtc value for time
-            memcpy(GpsStr,"xxxx.xxxxxN xxxxx.xxxxxW\0",25);
+            memcpy(GpsStr,"xxxx.xxxxxN,xxxxx.xxxxxW\0",25);
             memcpy(GpsTime,rtc.getTime().c_str(),9);
             memcpy(storeArray[StoreLastUsed].fix,GpsTime,8);
             storeArray[StoreLastUsed].fix[8]=' ';
@@ -54,7 +54,7 @@ bool StorePut(uint8_t *index, char *val, int32_t rssival) {
         }
 
         if(GENERATE_SERIAL_OUTPUT) {
-            snprintf(msg,80,"%03d %c %s %c %d \"%s\" %s",
+            snprintf(msg,80,"%03d,%c,%s,%c,%d,%s,%s",
                 StoreLastUsed,
                 storeArray[StoreLastUsed].mode,
                 Mac,
@@ -87,8 +87,8 @@ bool StorePut(uint8_t *index, char *val, int32_t rssival) {
     return false;
 }
 //---------------------------------------------------------
-int StoreFind(uint8_t *index) {
-    static uint8_t storeCtr;
+int StoreFind(uint8_t index[]) {
+    uint8_t storeCtr;
     for(storeCtr=0;storeCtr<MAX_SSID_STORE_SIZE;storeCtr++) {
         if (!memcmp(storeArray[storeCtr].MacAddress, index,6)) return storeCtr;
     }

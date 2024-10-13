@@ -52,7 +52,7 @@ void GpsReader(void *whereami) {
                         rtc.setTime(atoi(secs),atoi(mins),atoi(hours), 17, 1, 2024); 
                     }
                     GpsLock=true;
-;                   snprintf(GpsFix,40,"%s:%s:%s %s %s",hours,mins,secs,Latitude,Longitude);
+;                   snprintf(GpsFix,40,"%s:%s:%s,%s,%s",hours,mins,secs,Latitude,Longitude);
                     xSemaphoreGive(xShmem);
                 }
             }
