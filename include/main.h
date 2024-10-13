@@ -1,25 +1,14 @@
 #include <M5Cardputer.h>
 #include <SPI.h>
+#include <WiFi.h>
 #include <SD.h>
 #include <ESP32Time.h>
-#include "BatteryStatus.h"
-#include "ScreenPrint.h"
-#include "NetworkScan.h"
-#include "RollToFix.h"
-#include "StoreStruct.h"
 #include "Defines.h"
-#include "KeyboardBranch.h"
-#include "WiFiPacketHandler.h"
-#include "DeviceAdd.h"
-#include "ChannelHop.h"
-#include "GpsReader.h"
-//------------------------------------------
+#include "StoreStruct.h"
 #include "esp_wifi.h"
 #include "esp_wifi_types.h"
 #include "esp_system.h"
 #include "esp_event.h"
-#include "esp_event_loop.h"
-#include "nvs_flash.h"
 //-------------------------------------------
 static wifi_country_t wifi_country = {.cc="GB", .schan = 1, .nchan = 13}; 
 
@@ -27,6 +16,16 @@ SemaphoreHandle_t xScreen = NULL;
 SemaphoreHandle_t xShmem = NULL;
 QueueHandle_t PacketQueue;
 TaskHandle_t tasks[10];
+extern void ScreenPrint(char *, uint8_t,uint8_t, uint8_t,uint16_t,uint16_t);
+extern void DrawCircle(int32_t, int32_t, int32_t,int);
+extern void NetworkScan(void *);
+extern void RollToFix(void *);
+extern void WiFiPacketHandler(void*, wifi_promiscuous_pkt_type_t type);
+extern void ChannelHop(void *);
+extern void DeviceAdd(void *);
+extern void KeyboardBranch(void *);
+extern void BatteryStatus(void *);
+extern void GpsReader(void *);
 
 Store storeArray[MAX_SSID_STORE_SIZE+1];
 char DeviceTable[MAX_DEVICE_TABLE_SIZE][DEVICE_TABLE_RECSIZE];

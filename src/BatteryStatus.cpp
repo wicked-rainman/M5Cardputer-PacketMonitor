@@ -8,7 +8,7 @@
 //----------------------------------------------------------------------
 void BatteryStatus(void *something) {
     static int32_t BatteryPercentage=1;         //Don't understand why getBatteryLevel returns a 32 bit int
-    static int32_t PreviousCharge=0;
+    static int32_t PreviousCharge=0;            //Previous state of battery
 
     while(true) {
         BatteryPercentage=M5Cardputer.Power.getBatteryLevel();

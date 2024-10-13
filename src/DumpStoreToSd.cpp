@@ -66,7 +66,6 @@ void DumpDevices() {
 //----------------------------------------------------------------------
 
 void DumpFile(char *fname, bool OuiLookup) {
-    extern char *LookupOui(char *TargetMac);
     File file = SD.open(fname,FILE_READ);
     char InputLine[200];
     char MacStrSender[7];

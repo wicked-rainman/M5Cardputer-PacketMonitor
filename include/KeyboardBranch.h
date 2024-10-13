@@ -1,4 +1,7 @@
 #include <M5Cardputer.h>
-#include "ScreenPrint.h"
-#include "DumpStoreToSd.h"
+#include "Defines.h"
+#include <SD.h>
 void KeyboardBranch(void *);
+extern void DumpNetworks();
+extern void DumpDevices();
+extern void DumpFile(char *, bool);

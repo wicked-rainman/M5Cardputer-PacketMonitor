@@ -4,15 +4,21 @@
 // This is all about being as fast as possible as the OUI lookup file
 // is big. Order of processing is:
 // 1.   If the query mac is the same as the last one looked up, just 
-//      return the previous result
+//      return the previous result (Good for sequence exchanges)
 // 2.   If the mac has to be looked up in the file, cache the results
-//      and check the cache before the file
+//      and check the cache before reverting to the file
 // 3.   Mac is different, not in the cache, so look it up in the file
 //      then cache that result (Round robin fixed cache size)
+//
+// Note: This could be made quicker by looking up 3 bytes as a binary
+// but the distributed OUI file carrys ascii hex values. I suspect
+// most of the time goes in reading the SD card, so the speed benefits
+// in changing this might be negligible. To make it faster, either the
+// OUI file needs to be devided up more, or the whole file stored in
+// flash......
 //----------------------------------------------------------------------
 #include "LookupOui.h"
 char *LookupOui(char *TargetMac) {
-    void CharReplace(char *, char, char);
     char Line[200];
     static char ReturnStr[MAX_OUI_VENDOR_LEN+5];
     static char Cache[OUI_CACHE_SIZE][MAX_OUI_VENDOR_LEN];
@@ -21,7 +27,6 @@ char *LookupOui(char *TargetMac) {
     static File file;
     static File eq00;
     static File gt00;
-    char debug[6];
     int k;
     //---------------------------------------------------------------------
     //The OUI table has around 32k entries in it.
@@ -32,24 +37,16 @@ char *LookupOui(char *TargetMac) {
     //---------------------------------------------------------------------
     if(!eq00) {
         eq00=SD.open("/00Oui.txt");
-        if(!eq00) {
-            strncpy(ReturnStr,"Error",5);
-            ReturnStr[5]=0x0;
-            return ReturnStr;
-        }        
+        if(!eq00) return (char *) "Error";        
     }
 
     if(!gt00) {
         gt00=SD.open("/GT00Oui.txt");
-        if(!gt00) {
-            strncpy(ReturnStr,"Error",5);
-            ReturnStr[5]=0x0;
-            return ReturnStr;
-        }        
+        if(!gt00) return (char *) "Error";       
     }
 
-
     // Is the left half of the mac being looked up the same as previous lookup ?
+    // (Six bytes because it's a hex representation of 3 bytes)
     if (!memcmp(TargetMac,PreviousMac,6)) return ReturnStr;
 
     memcpy(PreviousMac,TargetMac,6);
@@ -58,8 +55,6 @@ char *LookupOui(char *TargetMac) {
         if(!memcmp(Cache[k],TargetMac,6)) {
             memcpy(ReturnStr,Cache[k]+7,MAX_OUI_VENDOR_LEN-7);
             ReturnStr[MAX_OUI_VENDOR_LEN-7]=0x0;
-            //snprintf(debug,6," #%03d",k);
-            //strcat(ReturnStr,debug);
             return ReturnStr;
         }    
     }

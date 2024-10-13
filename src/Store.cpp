@@ -4,6 +4,10 @@
 // Purpose: Maintains a rolling cache of MAC addresses
 //---------------------------------------------------------
 bool StorePut(uint8_t index[], char *val, int32_t rssival) {
+    extern void ScreenPrint(char *, uint8_t,uint8_t, uint8_t,uint16_t,uint16_t);
+    extern void DrawCircle(int32_t, int32_t, int32_t,int);
+    extern void DrawRect(int32_t,int32_t,int32_t,int32_t,int);
+    extern void DumpNetworks();
     static char msg[80];
     static char Mac[20];
     static int ValLen;
@@ -13,6 +17,7 @@ bool StorePut(uint8_t index[], char *val, int32_t rssival) {
     static char GpsStr[25];
     static char GpsTime[9];
     extern ESP32Time rtc;
+    extern void CharReplace(char *, char, char);
 
     if(StoreFind(index)<0) {                                           
         DrawCircle(230,80,5,TFT_GREEN);
@@ -76,7 +81,7 @@ bool StorePut(uint8_t index[], char *val, int32_t rssival) {
         ScreenPrint(msg,1,9,21,TFT_GREEN,TFT_BLACK);            //Mode
         snprintf(msg,2,"%c",storeArray[StoreLastUsed].rolling);
         ScreenPrint(msg,1,5,31,TFT_GREEN,TFT_BLACK);            //Rolling flag for recv
-        ScreenPrint(" ",1,7,31,TFT_BLACK,TFT_BLACK);            //Rolling flag for sndr
+        ScreenPrint((char *) " ",1,7,31,TFT_BLACK,TFT_BLACK);   //Rolling flag for sndr
         ScreenPrint(GpsStr,25,11,6,TFT_GREEN,TFT_BLACK);
         ScreenPrint(GpsTime,9,13,6,TFT_GREEN,TFT_BLACK);
         StoreLastUsed++;

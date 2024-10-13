@@ -10,11 +10,13 @@
 //-----------------------------------------------------------------------
 
 void DeviceAdd(void *abc) {
-    extern SemaphoreHandle_t xShmem;            //Shared memory lock
-    extern QueueHandle_t PacketQueue;           //Wifi packet handler incomming records
-    uint8_t NewMacs[12];                 //Two six byte macs
-    extern char DeviceTable[][160];             //Fully defined in main.h
-    extern int DeviceCount;                     //Count of mac pairs currently in cache
+
+    extern SemaphoreHandle_t xShmem;                    //Shared memory lock
+    extern QueueHandle_t PacketQueue;                   //Wifi packet handler incomming records
+    extern char DeviceTable[][160];                     //Fully defined in main.h
+    extern int DeviceCount;                             //Count of mac pairs currently in cache
+    extern Store storeArray[MAX_SSID_STORE_SIZE+1];
+    uint8_t NewMacs[12];                                //Two six byte macs
     uint8_t Mac1[6];
     uint8_t Mac2[6];
     static char Mac1Str[19];
@@ -71,8 +73,8 @@ void DeviceAdd(void *abc) {
             ScreenPrint(msg,2,7,31,TFT_GREEN,TFT_BLACK);
             snprintf(msg,4,"%03d",DeviceCount);
             ScreenPrint(msg,3,9,2,TFT_GREEN,TFT_BLACK);
-            ScreenPrint("-00 ",3,9,12,TFT_GREEN,TFT_BLACK);
-            ScreenPrint("D ",1,9,21,TFT_GREEN,TFT_BLACK);
+            ScreenPrint((char *) "-00 ",3,9,12,TFT_GREEN,TFT_BLACK);
+            ScreenPrint((char *) "D ",1,9,21,TFT_GREEN,TFT_BLACK);
             ScreenPrint(GpsStr,25,11,6,TFT_GREEN,TFT_BLACK);
             if((Mac2R=='R') && (AssocSsid[0]!=0)) snprintf(DeviceTable[DeviceCount],160,"%03d,D,%s,%c,%s,%c,%s(%s),%s,%s\n",
                     DeviceCount,Mac1Str,Mac1R,Mac2Str,Mac2R,ssid1,AssocSsid,GpsTime,GpsStr);

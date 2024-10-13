@@ -1,11 +1,19 @@
 #include "main.h"
 //-------------------------------------------------------------------
 // Main:
-// Purpose: Scan the 2.4 band for WiFi networks and store all found
+// Purpose: 
+// 1. Scan the 2.4 band for WiFi networks and store all found
 // Mac addresses and SSIDs.
-// Force the WiFi card to channel hop, collecting management packets.
-// Associate client mac addresses with WiFi mac addresses/SSIDs
+// 2. Force the WiFi card to channel hop, collecting management packets.
+// 3. Associate collected management packets with WiFi networks, while
+// attempting to associate rolling macs with real macs.
+// 4. Associate client mac addresses with WiFi mac addresses/SSIDs.
+// 5. On a button press ('l'), associate mac addresses with OUIs.
+//
 // 8th Oct 2024 - Version 0.9
+//
+// Note:
+// This is really all about trying to squeeze a quart into a pint pot
 //-------------------------------------------------------------------
 
 
@@ -23,17 +31,17 @@ void setup() {
 
   //Initialise the display
 
-  ScreenPrint("SSID ",5,1,1,TFT_WHITE,TFT_BLACK);   //Network SSID
-  ScreenPrint("ASSO ",5,3,1,TFT_WHITE,TFT_BLACK);   //Rolling mac associated SSID
-  ScreenPrint("RECV ",5,5,1,TFT_WHITE,TFT_BLACK);   //Destination MAC   
-  ScreenPrint("TYPE ",5,5,25,TFT_WHITE,TFT_BLACK);  //Destination MAC rolling of fixed
-  ScreenPrint("SNDR ",5,7,1,TFT_WHITE,TFT_BLACK);   //Source MAC
-  ScreenPrint("TYPE ",5,7,25,TFT_WHITE,TFT_BLACK);  //Source MAC rolling or fixed
-  ScreenPrint("#",1,9,1,TFT_WHITE,TFT_BLACK);       //Rec count
-  ScreenPrint("RSSI ",5,9,7,TFT_WHITE,TFT_BLACK);   //Network RSSI
-  ScreenPrint("MODE ",5,9,16,TFT_WHITE,TFT_BLACK);  //A=Network added, E=Rolling network edited, D=client
-  ScreenPrint("GPSF ",5,11,1,TFT_WHITE,TFT_BLACK);  //Current LAT/LON
-  ScreenPrint("TIME ",5,13,1,TFT_WHITE,TFT_BLACK);  //Current time, TAI or RTC
+  ScreenPrint((char *) "SSID ",5,1,1,TFT_WHITE, TFT_BLACK);   //Network SSID
+  ScreenPrint((char *) "ASSO ",5,3,1,TFT_WHITE, TFT_BLACK);   //Rolling mac associated SSID
+  ScreenPrint((char *) "RECV ",5,5,1,TFT_WHITE, TFT_BLACK);   //Destination MAC   
+  ScreenPrint((char *) "TYPE ",5,5,25,TFT_WHITE,TFT_BLACK);  //Destination MAC rolling of fixed
+  ScreenPrint((char *) "SNDR ",5,7,1,TFT_WHITE, TFT_BLACK);   //Source MAC
+  ScreenPrint((char *) "TYPE ",5,7,25,TFT_WHITE,TFT_BLACK);  //Source MAC rolling or fixed
+  ScreenPrint((char *) "#",1,9,1,TFT_WHITE,TFT_BLACK);       //Rec count
+  ScreenPrint((char *) "RSSI ",5,9,7,TFT_WHITE,TFT_BLACK);   //Network RSSI
+  ScreenPrint((char *) "MODE ",5,9,16,TFT_WHITE,TFT_BLACK);  //A=Network added, E=Rolling network edited, D=client
+  ScreenPrint((char *) "GPSF ",5,11,1,TFT_WHITE,TFT_BLACK);  //Current LAT/LON
+  ScreenPrint((char *) "TIME ",5,13,1,TFT_WHITE,TFT_BLACK);  //Current time, TAI or RTC
   DrawCircle(230,50,5,TFT_DARKGREY);                //Battery status
   DrawCircle(230,65,5,TFT_DARKGREY);                //Device added
   DrawCircle(230,80,5,TFT_DARKGREY);                //Network added
@@ -41,18 +49,14 @@ void setup() {
   DrawCircle(230,110,5,TFT_DARKGREY);               //GPS fix
   DrawCircle(230,125,5,TFT_DARKGREY);               //WiFi channel hop
 
-//Start storage card
+ SPI.begin(SD_SPI_SCK_PIN, SD_SPI_MISO_PIN, SD_SPI_MOSI_PIN, SD_SPI_CS_PIN);          //Start up SPI for the SD card
+ if (!SD.begin(SD_SPI_CS_PIN, SPI, 25000000)) USBSerial.println("SD: Mount FAILED");  //Try and mount the SD card
 
- SPI.begin(SD_SPI_SCK_PIN, SD_SPI_MISO_PIN, SD_SPI_MOSI_PIN, SD_SPI_CS_PIN);
- if (!SD.begin(SD_SPI_CS_PIN, SPI, 25000000)) USBSerial.println("SD: Mount FAILED");
-
-//Set up WiFi
-
-  nvs_flash_init();
-  tcpip_adapter_init();
+  //nvs_flash_init();
+  //tcpip_adapter_init();
   wifi_init_config_t cfg1 = WIFI_INIT_CONFIG_DEFAULT();
   esp_wifi_init(&cfg1);
-  esp_wifi_set_country(&wifi_country); 
+  //esp_wifi_set_country(&wifi_country); 
   esp_wifi_set_storage(WIFI_STORAGE_RAM);
   esp_wifi_set_mode(WIFI_MODE_NULL);
   esp_wifi_start();

@@ -29,14 +29,14 @@ void KeyboardBranch(void *abc) {
                 DumpDevices();  //Write current device cache
                 USBSerial.println("\n//-------<<<<<<<<<<<<<<<<<<<<< DUMP start >>>>>>>>>>>>>>>>>>>>------//");
                 if(Reason=='d') {
-                    DumpFile("/Networks.txt",false); //Dump whole network file
-                    DumpFile("/Devices.txt",false);  //Dump whole device file
+                    DumpFile((char *) "/Networks.txt",false); //Dump whole network file
+                    DumpFile((char *) "/Devices.txt",false);  //Dump whole device file
                 }
                 else {//Lookup OUI dump selected (l)
                     M5Cardputer.Display.setCursor(5,25);
                     M5Cardputer.Display.println("Rec: ");
-                    DumpFile("/Networks.txt",true); //Dump whole network file and resolve OUIs
-                    DumpFile("/Devices.txt",true);  //Dump whole device file amd resolve OUIs
+                    DumpFile((char *) "/Networks.txt",true); //Dump whole network file and resolve OUIs
+                    DumpFile((char *) "/Devices.txt",true);  //Dump whole device file amd resolve OUIs
                 }
                 USBSerial.println("\n//<<<<<<<<<<<<<<<<<<DUMP end >>>>>>>>>>>>>>>>>>>>//");
                 M5Cardputer.Display.fillScreen(TFT_BLACK);
@@ -52,8 +52,8 @@ void KeyboardBranch(void *abc) {
                 M5Cardputer.Display.setTextSize(3);
                 M5Cardputer.Display.setCursor(10,5);
                 M5Cardputer.Display.println("WAIT");
-                SD.remove("/Networks.txt");
-                SD.remove("/Devices.txt");
+                SD.remove((char *) "/Networks.txt");
+                SD.remove((char *) "/Devices.txt");
                 M5Cardputer.Display.fillScreen(TFT_BLACK);
                 M5Cardputer.Display.setCursor(10,5);
                 M5Cardputer.Display.println("Done");
