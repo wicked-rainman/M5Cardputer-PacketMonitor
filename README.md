@@ -1,6 +1,9 @@
 # M5Cardputer-PacketMonitor
-Summary: M5Cardputer (ESP32S3) scans for WiFi networks and associated management beacons from connected devices
-This code has been written to run on an M5Cardputer, but should port to any ESP32s3 board that has an SD card interface (and suitable screen if required). A Serial GPS is attached and a GPS lock is expected. Code is easy to modify if a GPS is not available.
+
+**Summary:** 
+M5Cardputer (ESP32S3) scans for WiFi networks and associated management beacons from connected devices
+This code has been written to run on an M5Cardputer, but should portable to any ESP32s3 board that has an SD card interface (and suitable screen if required). A Serial GPS is attached and a GPS lock is expected. Code could obviously be modify if a GPS is not available.
+
 ## Method
 On startup, two Mutexs are created. One for shared memory and one to organise screen writes. A small message queue is created to hold device MAC addresses (sender and receiver). The WiFi card is then placed in promiscuous mode.
 
@@ -19,7 +22,7 @@ Keyboard interaction can only take place after all tasks have initialised.
 
 - **'d'** Kills all current tasks. Appends current cache contents to the network and device files, then outputs the files content to the serial port. Files are not removed. Process then loops forever awaiting a reset.
 - **'w'** Kills all current tasks. Wipes the network and devices files, then waits forever, awaiting a reset.
-- **'L'** As 'D', but trys to resolve each fixed source mac address to an OUI. This is a slow process, better suited to a PC, but the facility is there if needed. Records are output on serial. 
+- **'L'** As 'D', but trys to resolve each fixed source mac address to an OUI. This is a slow process, better suited to a PC, but the facility is there for completeness. Records are output on serial. 
 
 ## To do
 
