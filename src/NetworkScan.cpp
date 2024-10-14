@@ -10,9 +10,7 @@ void NetworkScan(void *Summat) {
   while(true) {
     if(xSemaphoreTake(xShmem,5000)) {
       NetworkCount = WiFi.scanNetworks(false,true,true);
-      for (ctr = 0; ctr < NetworkCount; ctr++) { 
-        StorePut(WiFi.BSSID(ctr), (char *) WiFi.SSID(ctr).c_str(),WiFi.RSSI(ctr)); 
-      }
+      for (ctr = 0; ctr < NetworkCount; ctr++) StorePut(WiFi.BSSID(ctr), (char *) WiFi.SSID(ctr).c_str(),WiFi.RSSI(ctr)); 
       xSemaphoreGive(xShmem);
     }
     vTaskDelay(NETWORK_SCAN_INTERVAL);

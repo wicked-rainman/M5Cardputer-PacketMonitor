@@ -1,6 +1,4 @@
 #include "DumpStoreToSd.h"
-void CharReplace(char *, char, char);
-int CachePos=0;
 //----------------------------------------------------------------------
 // Function: DumpNetworks
 // Args: none
@@ -56,13 +54,16 @@ void DumpDevices() {
 }
 //----------------------------------------------------------------------
 // Function: DumpFile
-// Args: character pointer to the file that should be dumped.
+// Args: character pointer to the file that should be dumped, and a
+// boolean indicating if OUI lookups should be performed.
 //
 // Try and open the specified file, then read until EOF, writing to 
-// USBSerial. If the records being read are type A or D and are fixed
-// Mac addresses, then do a (slow) OUI lookup.
-// This function only ever gets called when the dump ('d') button
-// is pressed on the keyboard.
+// USBSerial. If the records being read contain a fixed
+// Mac address and OuiLookup is true, then do an OUI lookup. 
+// If the record is for a device (D in column 4) then there might be two 
+// fixed macs to look up.
+// This function gets called when the 'd' or 'l' button
+// is pressed on the keyboard (dump, or dump and lookup).
 //----------------------------------------------------------------------
 
 void DumpFile(char *fname, bool OuiLookup) {
@@ -77,22 +78,22 @@ void DumpFile(char *fname, bool OuiLookup) {
         while (file.available()) {
             k=file.readBytesUntil('\n',InputLine,200);
             InputLine[k]=0x0;
-            if(OuiLookup) {
+            if(OuiLookup) {                                                             //If OUI lookups specified
                 memset(OuiStr,0,150);
-                if(InputLine[19]=='F') {
+                if(InputLine[19]=='F') {                                                //If first mac address is fixed
                     memcpy(MacStrSender,InputLine+6,6);
-                    snprintf(OuiStr,150,",%s",LookupOui(MacStrSender));
+                    snprintf(OuiStr,150,",%s",LookupOui(MacStrSender));                 //Look up the OUI
                 }
-                else snprintf(OuiStr,150,",");
-                if(InputLine[4]=='D') {
-                    if (InputLine[34]=='F') {
+                else snprintf(OuiStr,150,",");                                          //Not fixed mac
+                if(InputLine[4]=='D') {                                                 //Devices record, so second mac to check
+                    if (InputLine[34]=='F') {                                           //Second mac is fixed
                         memcpy(MacStrReceiver,InputLine+21,6);
                         strcat(OuiStr,",");
                         strcat(OuiStr,LookupOui(MacStrReceiver));
                     }
-                    else strcat(OuiStr,",");
+                    else strcat(OuiStr,",");                                            //Second mac is floating
                 }
-                USBSerial.printf("%s%s\n",InputLine,OuiStr);
+                USBSerial.printf("%s%s\n",InputLine,OuiStr);                            //Output the record
             }
             else USBSerial.printf("%s\n",InputLine);
             M5Cardputer.Display.setCursor(60,25);

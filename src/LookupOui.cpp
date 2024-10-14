@@ -22,7 +22,7 @@ char *LookupOui(char *TargetMac) {
     char Line[200];
     static char ReturnStr[MAX_OUI_VENDOR_LEN+5];
     static char Cache[OUI_CACHE_SIZE][MAX_OUI_VENDOR_LEN];
-    extern int CachePos;
+    static int CachePos=0;
     static char PreviousMac[7];
     static File file;
     static File eq00;
@@ -44,43 +44,37 @@ char *LookupOui(char *TargetMac) {
         gt00=SD.open("/GT00Oui.txt");
         if(!gt00) return (char *) "Error";       
     }
+    if (!memcmp(TargetMac,PreviousMac,6)) return ReturnStr;                             //Vendor same as previous lookup
+    memcpy(PreviousMac,TargetMac,6);                                                    //Wasn't the same, so store it.
 
-    // Is the left half of the mac being looked up the same as previous lookup ?
-    // (Six bytes because it's a hex representation of 3 bytes)
-    if (!memcmp(TargetMac,PreviousMac,6)) return ReturnStr;
-
-    memcpy(PreviousMac,TargetMac,6);
-    //Is the left half of the mac in cache ?
+                                                                                        //Is the left half of the mac in cache ?
     for(k=0;k<OUI_CACHE_SIZE;k++) {
-        if(!memcmp(Cache[k],TargetMac,6)) {
+        if(!memcmp(Cache[k],TargetMac,6)) {                                             //Vendor found in cache
             memcpy(ReturnStr,Cache[k]+7,MAX_OUI_VENDOR_LEN-7);
             ReturnStr[MAX_OUI_VENDOR_LEN-7]=0x0;
-            return ReturnStr;
+            return ReturnStr;                                                           //Return vendor string
         }    
     }
-
-    //Not in cache, so look in oui file (Doh!)
-    //Choose which lookup file to use
-    if(!memcmp(TargetMac,"00",2)) file = eq00;
-    else file=gt00;
-    file.seek(0);
-    while(file.available()) {
+                                                                                        //Not in cache, so look in oui file (Doh!)
+    (!memcmp(TargetMac,"00",2)) ? (file = eq00) : (file=gt00);                          //Pick which file to use for lookup
+    file.seek(0);                                                                       //Go to the start of selected file
+    while(file.available()) {                                                           //Start reading OUI 
         k=file.readBytesUntil('\n',Line,200);
-        if(!memcmp(Line,TargetMac,6)) {
-            if(k>MAX_OUI_VENDOR_LEN) {
+        if(!memcmp(Line,TargetMac,6)) {  
+            CharReplace(Line,',',' ');                                                  //Remove any commas out of vendor string                                               //If mac matches
+            if(k>MAX_OUI_VENDOR_LEN) {                                                  //Cut off vendor length if it's too long
                 Line[MAX_OUI_VENDOR_LEN]=0x0;
-                CharReplace(Line,',',' ');
                 k=MAX_OUI_VENDOR_LEN;
             }
-            else Line[k]=0x0;
-            memset(Cache[CachePos],0,MAX_OUI_VENDOR_LEN);
-            memcpy(Cache[CachePos],Line,k);
-            memcpy(ReturnStr,Cache[CachePos++]+7,k-7);
+            else Line[k]=0x0;                                                           //Line wasn't too long
+            memset(Cache[CachePos],0,MAX_OUI_VENDOR_LEN);                               //Empty a slot in the cache
+            memcpy(Cache[CachePos],Line,k);                                             //Add result in for next time
+            memcpy(ReturnStr,Cache[CachePos]+7,k-7);                                    //Prepair vendor output
             ReturnStr[k-7]=0x0;
-            if(CachePos==OUI_CACHE_SIZE) CachePos=0;
-            return ReturnStr;
+            (CachePos==OUI_CACHE_SIZE) ? CachePos=0: CachePos++;                        //Move cache pointer on or RR.
+            return ReturnStr;                                                           //Return found vendor string
         }
     }
-    strncpy(ReturnStr,"NotFound\0",9);
+    strncpy(ReturnStr,"NotFound\0",9);                                                  //Vendor not found!
     return ReturnStr;
 }

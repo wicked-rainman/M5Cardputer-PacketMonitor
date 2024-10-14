@@ -12,8 +12,8 @@ void ChannelHop(void *abc) {
   static uint8_t channel=0;
   static bool OnOff;
   while(true) {
-    esp_wifi_set_channel(channelSequence[channel++], WIFI_SECOND_CHAN_NONE);
-   if(channel == CHANNEL_COUNT) channel = 0;
+    esp_wifi_set_channel(channelSequence[channel], WIFI_SECOND_CHAN_NONE);
+    (channel == CHANNEL_COUNT) ? channel = 0: channel++;
     OnOff ?   DrawCircle(230,125,5,TFT_PURPLE) : DrawCircle(230,125,5,TFT_CYAN);
     OnOff = !OnOff;
     vTaskDelay(WIFI_CHANNEL_SWITCH_INTERVAL);
